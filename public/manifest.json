@@ -1,22 +1,21 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
-  "icons": [
-    {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
-    },
-    {
-      "src": "logo192.png",
-      "type": "image/png",
-      "sizes": "192x192"
-    },
-    {
-      "src": "logo512.png",
-      "type": "image/png",
-      "sizes": "512x512"
-    }
+  "name": "원초적 본능",
+  "description": "인스타그램 DM의 내용과 URL을 분석하여 로맨스 스캠 위험성을 알려주는 확장 프로그램입니다.",
+  "version": "1.0.0",
+  "manifest_version": 3,
+  "action": {
+    "default_popup": "index.html"
+  },
+  "icons": {
+    "16": "favicon.ico",
+    "48": "logo192.png",
+    "128": "logo512.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": [
+    "activeTab"
   ],
   "start_url": ".",
   "display": "standalone",
