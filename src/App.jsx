@@ -4,6 +4,7 @@ function App() {
   return (
     <>
       <AlarmList />
+      <div id='modalArea'></div>
     </>
   );
 }

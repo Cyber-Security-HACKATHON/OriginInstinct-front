@@ -12,7 +12,7 @@ module.exports = {
         "yellow"     : "#FFD600",
         "softBlack"  : "#444444"
       },
-      fontFamily:{
+      fontFamily: {
         'plT' : ['plT'],
         'plEL' : ['plEL'],
         'plL' : ['plL'],
@@ -22,7 +22,7 @@ module.exports = {
         'plB' : ['plB'],
         'plEB' : ['plEB'],
         'plBlack' : ['plBlack'],
-      }
+      },
     },
   },
   plugins: [require("tailwind-scrollbar-hide")],

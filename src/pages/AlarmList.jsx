@@ -1,5 +1,5 @@
 import mfIcon from '../assets/magnifyIcon.png'
-import miniWarnIcon from '../assets/miniWarnIcon.png'
+import AlarmItem from '../components/AlarmList/AlarmItem.jsx';
 
 const dummy = [
   {
@@ -42,7 +42,7 @@ const dummy = [
 export default function AlarmList() {
 
   return (
-    <>
+    <div className='flex flex-col w-full h-full'>
       <div className="p-3 pe-0 flex w-72 h-12 bg-white gap-3 justify-center items-center">
         <img src={mfIcon} className='w-4 h-4'/>
         <div className='font-plEB text-xl text-transparent bg-clip-text bg-gradient-to-r from-pink via-yellow to-purple'>분석 결과</div>
@@ -52,30 +52,10 @@ export default function AlarmList() {
       <div className="w-72 h-72 bg-softGray p-2 overflow-scroll scrollbar-hide">
         <div className='flex flex-col gap-1 '>
           {dummy.map((dummyItem, idx) => (
-            <div key={idx} className='h-12 rounded-[10px] p-2 flex gap-2 items-center'>
-              <div className='relative'>
-                <img src={dummyItem.profileImg} className='rounded-full w-[30px] h-[30px]' />
-                <div className={`flex items-center justify-center rounded-full w-4 h-4 z-10 absolute bottom-[-4px] right-[-4px] ${
-                  dummyItem.warnLevel === 1
-                  ? 'bg-softGray'
-                  : dummyItem.warnLevel === 2
-                  ? 'bg-yellow'
-                  : dummyItem.warnLevel === 3
-                  ? 'bg-purple'
-                  : dummyItem.warnLevel === 4
-                  ? 'bg-pink'
-                  : 'bg-red-600'
-                }`}>
-                  <img src={miniWarnIcon} className='w-[10px]'/>
-                </div>
-              </div>
-              <div className='font-plR text-xs text-black truncate'>
-                <span className='font-plM'>@{dummyItem.nickName}</span> &nbsp; 주의가 필요한 사용자입니다.
-              </div>
-            </div>
+            <AlarmItem key={idx} {...dummyItem} />
           ))}
         </div>
       </div>
-    </>
+    </div>
   );
 }
