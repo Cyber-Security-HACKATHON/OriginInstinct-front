@@ -15,15 +15,8 @@
     "service_worker": "background.js",
     "scripts": ["hot-reload.js"]
   },
-  "content_scripts": [
-    { 
-      "js": ["content.js"],
-      "matches": [ "<all_urls>"]
-    }
-  ],
   "permissions": [
-    "activeTab",
-    "storage"
+    "activeTab"
   ],
   "start_url": ".",
   "display": "standalone",

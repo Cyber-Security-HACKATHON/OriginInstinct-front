@@ -25,8 +25,8 @@ export default function WarnInfoModal() {
   const [, setModalOpen] = useRecoilState(infoModalState)
 
   return (
-    <div className='w-full h-full flex items-center justify-center'>
-      <div className="flex w-[524px] h-[370px] rounded-[15px] drop-shadow-lg bg-white items-center justify-center">
+    // <div className='w-full h-full flex items-center justify-center'>
+      <div className="flex w-[524px] h-[370px] drop-shadow-lg bg-white items-center justify-center">
         <div className="relative w-[500px] h-[346px] rounded-[10px] border-transparent bg-clip-border bg-gradient-to-r from-pink via-yellow to-purple flex items-center justify-center">
           <div className='bg-white p-[14px] w-[496px] h-[342px] rounded-[10px] flex flex-col gap-5'>
 
@@ -70,6 +70,6 @@ export default function WarnInfoModal() {
           </div>
         </div>
       </div>
-    </div>
+    // </div>
   );
 }
