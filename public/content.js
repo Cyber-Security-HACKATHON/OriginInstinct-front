@@ -19,6 +19,7 @@ let otherId = '';
 let userId = '';
 let scrollInterval = null;  // 스크롤 간격 저장용
 let currentUrl = window.location.href;  // 현재 URL 저장
+let isExtracting = false;
 
 // 내 아이디 추출 함수
 function extractUserId() {
@@ -140,8 +141,8 @@ function scrollAndExtract() {
 
             // 최종 메시지와 아이디 출력
             console.log('최종 메시지 목록:', chatList);
-            console.log('최종 아이디 목록:', otherId);
-            console.log('내 아이디:', userId);
+            console.log('최종 상대방 아이디:', otherId);
+            console.log('최종 내 아이디:', userId);
           } else {
             previousHeight = currentHeight;
           }
