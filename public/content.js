@@ -154,6 +154,7 @@ function scrollAndExtract() {
   }
 }
 
+
 // 스크립트 종료 함수 (모든 옵저버 및 인터벌 중단)
 function stopScript() {
   clearInterval(scrollInterval);       // 스크롤 중단

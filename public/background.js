@@ -1,16 +1,7 @@
-import './crx-hotreload.js';
+// import './crx-hotreload.js';
+
+// content_script는 content.js 자동 실행, 따로 조작하려면 manifest.json에서 content_script를 없애고 background.js에 작성
 
 chrome.runtime.onInstalled.addListener(() => {
   console.log('React Extension Installed');
-});
-
-chrome.action.onClicked.addListener((tab) => {
-  if (tab.url.includes("instagram.com/direct/t/")) {
-      chrome.scripting.executeScript({
-          target: { tabId: tab.id },
-          files: ['content.js']
-      });
-  } else {
-      console.log("Instagram DM 페이지에서만 사용할 수 있습니다.");
-  }
 });

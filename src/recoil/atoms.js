@@ -12,3 +12,13 @@ export const infoModalState = atom({
   default: false,
 	effects_UNSTABLE: [persistAtom],
 });
+
+export const isScanningState = atom({
+  key: 'isScanningState',
+  default: false  // 초기값(실행 전)
+});
+
+export const consentModalState = atom({
+  key: 'consentModalState',
+  default: false
+});
