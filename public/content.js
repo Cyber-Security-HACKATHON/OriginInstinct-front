@@ -1,18 +1,3 @@
-// 데이터 서버로 전송
-// function sendToServer(userId, otherId, chatList) {
-//   const data = { userId, otherId, chatList };
-//   fetch(/api/chat/analyze, {
-//     method: 'POST',
-//     headers: {
-//       'Content-Type': 'application/json',
-//     },
-//     body: JSON.stringify(data),
-//   })
-//   .then(response => response.json())
-//   .then(data => console.log('Success:', data))
-//   .catch((error) => console.log('Error:', error));
-// }
-
 // 메시지를 저장할 배열, 아이디를 저장할 문자열
 let chatList = [];
 let otherId = '';
@@ -20,6 +5,23 @@ let userId = '';
 let scrollInterval = null;  // 스크롤 간격 저장용
 let currentUrl = window.location.href;  // 현재 URL 저장
 let isExtracting = false;
+let isReady = true; // 추출 함수를 포함한 scrollAndExtract 플래그
+
+
+// 데이터 서버로 전송
+// function sendToServer(userId, otherId, chatList) {
+//   const data = { userId, otherId, chatList };  
+//   fetch(/api/chat/analyze, {
+//     method: 'POST',  
+//     headers: {
+//       'Content-Type': 'application/json',  
+//     },
+//     body: JSON.stringify(data),
+//   })
+//   .then(response => response.json())
+//   .then(data => console.log('Success:', data))
+//   .catch((error) => console.log('Error:', error));
+// }
 
 // 내 아이디 추출 함수
 function extractUserId() {
@@ -83,6 +85,8 @@ function extractChatList() {
 
 // 무한 스크롤 기능 추가 (자동 스크롤)
 function scrollAndExtract() {
+  if (!isReady) return;
+
   // 메시지 입력창
   const messageInput = document.querySelector('div[aria-label="메시지"]');
   if (messageInput) {
@@ -113,15 +117,21 @@ function scrollAndExtract() {
 
     // 스크롤 후 일정 시간 대기
     setTimeout(() => {
+      if (!isReady) return;
+
       let previousHeight = scrollableElement.scrollHeight;
       let currentHeight = previousHeight;
 
       scrollInterval = setInterval(() => {
+        if (!isReady) return;
+
         // 스크롤을 끝까지 내림
         scrollableElement.scrollTop = scrollableElement.scrollHeight;
 
         // 스크롤 후 일정 시간 대기
         setTimeout(() => {
+          if (!isReady) return;
+          
           currentHeight = scrollableElement.scrollHeight;
 
           // 스크롤 높이가 변하지 않으면 스크롤 중단
@@ -157,6 +167,7 @@ function scrollAndExtract() {
 
 // 스크립트 종료 함수 (모든 옵저버 및 인터벌 중단)
 function stopScript() {
+  isReady = false;
   clearInterval(scrollInterval);       // 스크롤 중단
   mutationObserver.disconnect();       // DOM 감지 중단
   urlObserver.disconnect();            // URL 감지 중단

@@ -10,10 +10,34 @@ document.addEventListener('DOMContentLoaded', () => {
   button.addEventListener('click', () => {
     isScanning = !isScanning; // 상태 토글
     const action = isScanning ? 'startScan' : 'stopScan';
-    chrome.runtime.sendMessage({ action: action });
-    // chrome.runtime.sendMessage({ action: 'createModal' });
-    createModal();
-    button.textContent = isScanning ? '검사 중단' : '검사 시작';
+
+    if (isScanning) {
+      // 검사 시작 버튼을 클릭했을 때 - 동의 모달 띄우기 - 스크립트 동작
+      chrome.runtime.sendMessage({ action: action });
+      createModal();
+      button.textContent = isScanning ? '검사 중단' : '검사 시작';
+    } else {
+      // 검사 종료 버튼을 클릭했을 때 - stopScript
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        chrome.scripting.executeScript({
+          target: { tabId: tabs[0].id },
+          files: ['content.js']
+        }).then(() => {
+          chrome.scripting.executeScript({
+            target: { tabId: tabs[0].id },
+            func: () => {
+              if (typeof stopScript === 'function') {
+                stopScript();
+              } else {
+                console.error('stopScript 함수가 존재하지 않습니다.');
+              }
+            }
+          });
+        }).catch((error) => {
+          console.error('Error injecting content.js:', error);
+        });
+      });
+    };
   });
 });
 
