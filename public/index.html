@@ -12,16 +12,41 @@
     <script src="popup.js"></script>
   </body>
   <style>
-    body {
-      width: 524px;
-      height: 370px;
-      /* width: 288px;
-      height: 336px; */
+    @font-face {
+      font-family: 'plEB';
+      src: url(../src/fonts/Paperlogy-8ExtraBold.ttf);
     }
-    button {
-      margin: 20px;
-      padding: 10px 20px;
-      font-size: 16px;
+
+    body {
+      position: relative;
+      width: 524px;
+      height: 358px;
+    }
+
+    #openModalBtn {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      width: 116px;
+      height: 44px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'plEB';
+      font-size: 24px;
+      color: white;
+      padding: 0px 5px;
+      background-color: #FF004D;
+      border-radius: 7px;
+      border: 1px white;
+      box-shadow: 3px 3px #8a002a;
+      transition: all 0s;
+    }
+
+    #openModalBtn:active {
+      bottom: 14px;
+      right: 14px;
+      box-shadow: inset 3px 3px #8a002a;
     }
   </style>
 </html>
