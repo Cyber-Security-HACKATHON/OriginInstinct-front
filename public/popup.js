@@ -1,6 +1,7 @@
 // popup에서 모달 바로 생성->content.js 함수 실행
 // content_scripts에 주입하면 CSP 제약이 없지만 무조건 페이지 로드시 content.js 실행
 // content_scripts를 없애면 사용자가 원할 때 실행이 가능하지만 CSP 제약 걸림
+// content.js에서 발생하는 인라인 스크립트 금지 -> agreeButton.onClick 때문에 막히는듯...
 
 document.addEventListener('DOMContentLoaded', () => {
   const button = document.getElementById('openModalBtn');

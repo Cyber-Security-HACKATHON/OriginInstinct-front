@@ -1,5 +1,5 @@
 {
-  "name": "스캠 분석",
+  "name": "테스트",
   "description": "인스타그램 DM의 내용과 URL을 분석하여 로맨스 스캠 위험성을 알려주는 확장 프로그램입니다.",
   "version": "1.0.0",
   "manifest_version": 3,
