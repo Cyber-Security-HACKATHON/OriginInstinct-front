@@ -1,11 +1,16 @@
+// 채팅이 올 때마다 전송을 해야 하는거면 api 전송을 하고 난 다음 배열을 비워야 하나?????
+
+// 첫 실행은 무조건 scrollAndExtract
 // 메시지를 저장할 배열, 아이디를 저장할 문자열
 let chatList = [];
 let otherId = '';
 let userId = '';
+let otherNickname = ''; // 상대방 닉네임(상대방 메시지만 뽑는데 필요)
 let scrollInterval = null;  // 스크롤 간격 저장용
 let currentUrl = window.location.href;  // 현재 URL 저장
 let isExtracting = false;
 let isReady = true; // 추출 함수를 포함한 scrollAndExtract 플래그
+// 돔 변화가 생겼을 때 중복 실행을 방지하는 플래그 필요
 
 
 // 데이터 서버로 전송
@@ -67,18 +72,40 @@ function extractOtherId() {
 function extractChatList() {
   if (isExtracting) return;  // 이미 추출 중이라면 중복 실행 방지
 
-  const messageElements = document.querySelectorAll('div[dir="auto"]');
+  const messageElements = document.querySelectorAll('div[data-scope="messages_table"] div[dir="auto"]');
+  
   if (messageElements.length === 0) {
     console.log("메시지를 찾을 수 없습니다.");
     return;
   }
+  
+  let isInTargetMessages = false; // 현재 대화가 상대방 메시지 영역인지 여부
+  
+  // if (h5Element && h5Element.textContent !== '보낸 메시지')이렇게 했을때 forEach때문에 도중에 내가 보낸게 나오면 그 뒤부터는 짤림
+  messageElements.forEach(messageElement => {
+    const h5Element = messageElement.closest('div[data-scope="messages_table"]').querySelector('h5[dir="auto"] span');
+    
+    if (h5Element) {
+      // 말풍선마다 보낸사람 닉네임 추출
+      const sender = h5Element.textContent.trim();
+      
+      if (sender === otherNickname) {
+        // 상대방의 메시지 영역에 진입
+        isInTargetMessages = true;
 
-  messageElements.forEach((element) => {
-    const messageText = element.innerText.trim();
-    if (messageText && !chatList.includes(messageText)) {
-      chatList.push(messageText);
-      console.log(`메시지: ${messageText}`);
-      console.log('-------------------');
+      } else {
+        isInTargetMessages = false;
+      }
+    }
+
+    // 상대방 메시지 영역에 있을 때만 추출
+    if (isInTargetMessages) {
+      const messageText = messageElement.textContent.trim();
+      if (messageText && !chatList.includes(messageText)) {
+        chatList.push(messageText);
+        console.log(`메시지: ${messageText}`);
+        console.log('---------------------');
+      }
     }
   });
 }
@@ -106,6 +133,11 @@ function scrollAndExtract() {
     return;
   }
 
+  // 상대방 닉네임 저장하기
+  const ariaLabel = chatWindow.getAttribute('aria-label');
+  otherNickname = ariaLabel.split('과 나눈 대화의 메시지')[0];
+  console.log(`상대방 닉네임: ${otherNickname}`);
+
   // chatWindow 내부에서 스크롤 가능한 자식 요소 찾기
   const scrollableElement = Array.from(chatWindow.querySelectorAll('div')).find(el => el.scrollHeight > el.clientHeight);
 
@@ -131,7 +163,7 @@ function scrollAndExtract() {
         // 스크롤 후 일정 시간 대기
         setTimeout(() => {
           if (!isReady) return;
-          
+
           currentHeight = scrollableElement.scrollHeight;
 
           // 스크롤 높이가 변하지 않으면 스크롤 중단
@@ -189,6 +221,7 @@ const urlObserver = new MutationObserver(() => {
     chatList.length = 0;            // 메시지 배열 초기화
     otherId = '';                  // 아이디 배열 초기화
     userId = '';  // 내 아이디 배열 초기화
+    otherNickname = ''; // 상대방 닉네임 초기화
     currentUrl = window.location.href; // URL 업데이트
   }
 });
@@ -201,7 +234,8 @@ const mutationObserver = new MutationObserver((mutationsList) => {
   for (const mutation of mutationsList) {
     if (mutation.type === 'childList' && mutation.addedNodes.length) {
       console.log("새로운 메시지가 감지되었습니다.");
-      extractChatList();  // 새로운 메시지 추출
+      extractChatList();  // 새로운 메시지 추출 -> 하고 api 요청
+      // api 요청
     }
   }
 });
