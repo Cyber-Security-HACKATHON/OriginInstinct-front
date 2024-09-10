@@ -1,43 +1,18 @@
-// popup에서 모달 바로 생성->content.js 함수 실행
-// content_scripts에 주입하면 CSP 제약이 없지만 무조건 페이지 로드시 content.js 실행
-// content_scripts를 없애면 사용자가 원할 때 실행이 가능하지만 CSP 제약 걸림
-// content.js에서 발생하는 인라인 스크립트 금지 -> agreeButton.onClick 때문에 막히는듯...
+// 실행되고 검사 다 끝나면 버튼 검사시작으로 바뀌게
+
+const button = document.getElementById('openModalBtn');
+let isScanning = false; // 상태를 관리할 변수
 
 document.addEventListener('DOMContentLoaded', () => {
-  const button = document.getElementById('openModalBtn');
-  let isScanning = false; // 상태를 관리할 변수
-
   button.addEventListener('click', () => {
-    isScanning = !isScanning; // 상태 토글
-    const action = isScanning ? 'startScan' : 'stopScan';
-
-    if (isScanning) {
-      // 검사 시작 버튼을 클릭했을 때 - 동의 모달 띄우기 - 스크립트 동작
-      chrome.runtime.sendMessage({ action: action });
+    if (!isScanning) {
+      // 검사 시작 버튼 클릭 - 모달을 열고 동의 받기
+      chrome.runtime.sendMessage({ action: 'startScan' });
       createModal();
-      button.textContent = isScanning ? '검사 중단' : '검사 시작';
     } else {
-      // 검사 종료 버튼을 클릭했을 때 - stopScript
-      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        chrome.scripting.executeScript({
-          target: { tabId: tabs[0].id },
-          files: ['content.js']
-        }).then(() => {
-          chrome.scripting.executeScript({
-            target: { tabId: tabs[0].id },
-            func: () => {
-              if (typeof stopScript === 'function') {
-                stopScript();
-              } else {
-                console.error('stopScript 함수가 존재하지 않습니다.');
-              }
-            }
-          });
-        }).catch((error) => {
-          console.error('Error injecting content.js:', error);
-        });
-      });
-    };
+      // 검사 중단 버튼 클릭 - stopScript 실행
+      stopScanning();
+    }
   });
 });
 
@@ -60,7 +35,7 @@ function createModal() {
   modalContent.style.padding = '20px';
   modalContent.style.borderRadius = '8px';
   modalContent.style.textAlign = 'center';
-  
+
   const title = document.createElement('h2');
   title.textContent = '사전 동의 필요';
   modalContent.appendChild(title);
@@ -80,30 +55,9 @@ function createModal() {
   agreeButton.style.borderRadius = '5px';
   agreeButton.style.cursor = 'pointer';
 
-  // 동의 버튼 클릭 시 추출 함수 실행 및 모달 닫기
   agreeButton.onclick = () => {
-    console.log('동의 완료, 검사 시작');
+    startScanning();
     document.body.removeChild(modalOverlay);
-    // scrollAndExtract(); // 검사 실행 함수 호출
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      chrome.scripting.executeScript({
-        target: { tabId: tabs[0].id },
-        files: ['content.js'] // content.js를 주입하여 페이지에 함수 정의(이거 안하고 바로 func() => 보내니까 함수 없다고 오류뜬다(기존에 주입돼있어야함))
-      }).then(() => {
-        chrome.scripting.executeScript({
-          target: { tabId: tabs[0].id },
-          func: () => {
-            if (typeof scrollAndExtract === 'function') {
-              scrollAndExtract();
-            } else {
-              console.error('scrollAndExtract 함수가 존재하지 않습니다.');
-            }
-          }
-        });
-      }).catch((error) => {
-        console.error('Error injecting content.js:', error);
-      });
-    });
   };
   modalContent.appendChild(agreeButton);
 
@@ -118,9 +72,7 @@ function createModal() {
   cancelButton.style.borderRadius = '5px';
   cancelButton.style.cursor = 'pointer';
 
-  // 취소 버튼 클릭 시 모달 제거
   cancelButton.onclick = () => {
-    console.log('검사 취소');
     document.body.removeChild(modalOverlay);
   };
   modalContent.appendChild(cancelButton);
@@ -128,4 +80,47 @@ function createModal() {
   // 모달 페이지에 추가
   modalOverlay.appendChild(modalContent);
   document.body.appendChild(modalOverlay);
+}
+
+function startScanning() {
+  isScanning = true;
+  button.textContent = '검사 중단';
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    chrome.scripting.executeScript({
+      target: { tabId: tabs[0].id },
+      files: ['content.js']
+    }).then(() => {
+      chrome.scripting.executeScript({
+        target: { tabId: tabs[0].id },
+        func: () => {
+          if (typeof scrollAndExtract === 'function') {
+            scrollAndExtract(() => {
+              chrome.runtime.sendMessage({ action: 'stopScan' });
+            });
+          } else {
+            console.error('scrollAndExtract 함수가 존재하지 않습니다.');
+          }
+        }
+      });
+    }).catch((error) => {
+      console.error('Error injecting content.js:', error);
+    });
+  });
+}
+
+function stopScanning() {
+  isScanning = false;
+  button.textContent = '검사 시작';
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    chrome.scripting.executeScript({
+      target: { tabId: tabs[0].id },
+      func: () => {
+        if (typeof stopScript === 'function') {
+          stopScript();
+        } else {
+          console.error('stopScript 함수가 존재하지 않습니다.');
+        }
+      }
+    });
+  });
 }
