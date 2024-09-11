@@ -25,5 +25,6 @@
   },
   "options": {
     "apiBaseUrl": "10.30.0.75:8080"
-  }
+  },
+  "options_page": "options.html"
 }

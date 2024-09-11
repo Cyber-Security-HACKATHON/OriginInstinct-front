@@ -14,20 +14,55 @@ if (!window.hasRun) {
   let isExtracting = false;
   let isReady = true; // 추출 함수를 포함한 scrollAndExtract 플래그
 
+  chrome.storage.local.set({ 'scamPercent' : {
+    'scamCount': 0,
+    'totalCount': 0
+  }})
+
   // 데이터 서버로 전송
-  // function sendToServer(userId, otherId, chatList) {
-  //   const data = { userId, otherId, chatList };  
-  //   fetch(`${baseUrl}/api/chat/analyze`, {
-  //     method: 'POST',  
-  //     headers: {
-  //       'Content-Type': 'application/json',  
-  //     },
-  //     body: JSON.stringify(data),
-  //   })
-  //   .then(response => response.json())
-  //   .then(data => console.log('Success:', data))
-  //   .catch((error) => console.log('Error:', error));
-  // }
+  function sendToServer(userId, otherId, chatList) {
+    const data = { 
+      'userId': userId, 
+      'otherId': otherId, 
+      'data': chatList[chatList.length-1] 
+    };  
+    fetch('http://localhost:8080/api/chat/analyze', {
+      method: 'POST',  
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+
+      },
+      body: JSON.stringify(data),
+    })
+    .then(response => response.json())
+    .then((data) => {
+      chrome.storage.local.set({ 'analyzeResult' : {
+        'isScam': data.isScam,
+        'badUrl': data.badUrl,
+        'chatResponse': data.chatResponse,
+        'originChat': data.originChat,
+        'scamCount': 0
+      }})
+
+      const percentInfo = chrome.storage.local.get(['scamPercent'])
+      const scamCountValue = percentInfo.scamCount
+      const totalCountValue = percentInfo.totalCount
+
+      if (data.chatResponse.result === 1) {
+        chrome.storage.local.set({ 'scamPercent' : {
+          'scamCount': scamCountValue + 1,
+          'totalCount': totalCountValue + 1
+        }})
+      } else {
+        chrome.storage.local.set({ 'scamPercent' : {
+          'scamCount': scamCountValue,
+          'totalCount': totalCountValue + 1
+        }})
+      }
+    })
+    .catch((error) => console.log('Error:', error));
+  }
   
   // 내 아이디 추출 함수(창 작아져서 반응형으로 내 아이디 부분 사라지면 없다고 나옴)
   function extractUserId() {
@@ -112,7 +147,7 @@ if (!window.hasRun) {
       }
 
     });
-    // sendToServer(userId, otherId, chatList);
+    sendToServer(userId, otherId, chatList);
     console.log('전송완료');
     isExtracting = false;
     console.log('진짜최종', chatList);  // 다끝나고 최종버전 찍기(이거 안찍어서 한시간넘게 헛짓함)

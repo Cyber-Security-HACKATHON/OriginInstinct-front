@@ -66,6 +66,7 @@ function createModal() {
 
   // 동의 버튼 생성
   const agreeButton = document.createElement('button');
+  agreeButton.id = 'agreeButton'
   agreeButton.textContent = isScanning ? '중단' : '동의';
   agreeButton.style.backgroundColor = isScanning ? '#dc3545' : '#4CAF50';
   agreeButton.style.display = 'flex';
@@ -97,10 +98,11 @@ function createModal() {
         chrome.scripting.executeScript({
           target: { tabId: tabs[0].id },
           func: () => {
+            const agreeButton = document.getElementById('agreeButton') 
             if (typeof scrollAndExtract === 'function') {
-              if (agreeButton.textContent === '중단') {
+              // if (agreeButton.textContent === '중단') {
                 scrollAndExtract();
-              } else stopScript();
+              // } else stopScript();
             } else {
               console.error('scrollAndExtract 함수가 존재하지 않습니다.');
             }

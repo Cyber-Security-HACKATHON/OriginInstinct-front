@@ -6,7 +6,7 @@ import { infoModalState } from './recoil/atoms.js';
 
 function App() {
   const isOpen = useRecoilValue(infoModalState)
-  
+
   return (
     <div className='relative'>
       {/* <NavBar /> */}
