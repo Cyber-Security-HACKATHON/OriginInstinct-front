@@ -225,6 +225,7 @@ if (!window.hasRun) {
     if (currentUrl !== window.location.href) {
       console.log("페이지가 변경되었습니다. 스크립트를 중단합니다.");
       stopScript();
+      window.hasRun = false;  //
       chatList.length = 0;
       otherId = '';
       userId = '';
