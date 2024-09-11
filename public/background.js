@@ -4,4 +4,8 @@
 
 chrome.runtime.onInstalled.addListener(() => {
   console.log('React Extension Installed');
+  // chrome.storage.sync.set({ apiBaseUrl: '10.30.0.75:8080' }, () => {
+    // console.log('API Base URL 설정 완료');
+  // });
 });
+

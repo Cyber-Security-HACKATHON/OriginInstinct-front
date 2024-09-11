@@ -1,3 +1,6 @@
+// chrome.runtime.getManifest().options.apiBaseUrl;
+// const baseUrl = chrome.runtime.getManifest().options.apiBaseUrl;
+
 if (!window.hasRun) {
   window.hasRun = true;
 
@@ -14,7 +17,7 @@ if (!window.hasRun) {
   // 데이터 서버로 전송
   // function sendToServer(userId, otherId, chatList) {
   //   const data = { userId, otherId, chatList };  
-  //   fetch('/api/chat/analyze', {
+  //   fetch(`${baseUrl}/api/chat/analyze`, {
   //     method: 'POST',  
   //     headers: {
   //       'Content-Type': 'application/json',  
@@ -110,6 +113,7 @@ if (!window.hasRun) {
 
     });
     // sendToServer(userId, otherId, chatList);
+    console.log('전송완료');
     isExtracting = false;
     console.log('진짜최종', chatList);  // 다끝나고 최종버전 찍기(이거 안찍어서 한시간넘게 헛짓함)
   }
