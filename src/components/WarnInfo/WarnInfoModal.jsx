@@ -3,24 +3,6 @@ import { useRecoilState } from 'recoil';
 import { infoModalState } from '../../recoil/atoms';
 import { useEffect, useState } from 'react';
 
-const dummyInfo = {
-  nickName : 'plzmoney',
-  profileUrl : 'https://image.cine21.com/resize/cine21/still/2005/1121/M0020066_focus52804[W578-].jpg',
-  msgList : [
-    'http://www.thisisfakecoin.com',
-    '이거 정말 좋은 투자 정보야',
-    '200% 수익률 보장된대',
-    '너한테만 알려주는거니까 절대 다른사람한테 절대 알리면 안돼 비밀 지켜!'
-  ],
-  isSafeUrl : false,
-  keywordList : [
-    '투자',
-    '높은 수익률',
-    '비밀'
-  ],
-  isSafeUser : false
-}
-
 export default function WarnInfoModal() {
   const [, setModalOpen] = useRecoilState(infoModalState)
 
