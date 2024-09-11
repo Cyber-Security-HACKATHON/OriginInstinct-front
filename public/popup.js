@@ -87,7 +87,6 @@ function createModal() {
     isScanning = !isScanning; // 상태 토글
     button.textContent = isScanning ? '검사 중단' : '검사 시작'; 
 
-    console.log('동의 완료, 검사 시작');
     document.body.removeChild(modalOverlay);
     // scrollAndExtract(); // 검사 실행 함수 호출
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -99,7 +98,9 @@ function createModal() {
           target: { tabId: tabs[0].id },
           func: () => {
             if (typeof scrollAndExtract === 'function') {
-              scrollAndExtract();
+              if (agreeButton.textContent === '중단') {
+                scrollAndExtract();
+              } else stopScript();
             } else {
               console.error('scrollAndExtract 함수가 존재하지 않습니다.');
             }

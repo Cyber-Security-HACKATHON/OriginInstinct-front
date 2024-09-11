@@ -22,3 +22,13 @@ export const consentModalState = atom({
   key: 'consentModalState',
   default: false
 });
+
+export const analyzeResult = atom({
+  key: 'analyzeResult',
+  default: {
+    'isScam': false,
+    'chatList': [],
+    'isBadUrl': false
+  },
+  storage: localStorage
+})

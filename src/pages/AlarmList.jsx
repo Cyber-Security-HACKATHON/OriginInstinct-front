@@ -43,7 +43,7 @@ export default function AlarmList() {
 
   return (
     <div className='flex flex-col w-full h-full'>
-      <div className="p-5 pe-0 flex w-full h-12 bg-white justify-between items-center">
+      <div className="p-3 pe-0 flex w-full h-12 bg-white justify-between items-center">
         <div className='flex gap-3 items-center'>
           <img src={mfIcon} className='w-4 h-4'/>
           <div className='font-plEB text-xl text-transparent bg-clip-text bg-gradient-to-r from-pink via-yellow to-purple'>분석 결과</div>

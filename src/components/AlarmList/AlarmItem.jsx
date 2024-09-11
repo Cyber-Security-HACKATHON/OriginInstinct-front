@@ -6,7 +6,7 @@ export default function AlarmItem({ profileImg, warnLevel, nickName }) {
   const [, setModalOpen] = useRecoilState(infoModalState)
 
   return (
-    <button onClick={() => setModalOpen(true)} className='h-12 rounded-[10px] p-6 flex gap-5 items-center'>
+    <button onClick={() => setModalOpen(true)} className='h-12 rounded-[10px] p-3 flex gap-5 items-center'>
       <div className='relative'>
         <img src={profileImg} className='rounded-full w-[30px] h-[30px]' />
         <div className={`flex items-center justify-center rounded-full w-4 h-4 z-10 absolute bottom-[-4px] right-[-4px] ${
