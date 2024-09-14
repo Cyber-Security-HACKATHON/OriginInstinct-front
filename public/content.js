@@ -19,6 +19,10 @@ if (!window.hasRun) {
     'totalCount': 0
   }})
 
+  chrome.storage.local.set({ 'isDone' : false })
+
+  chrome.storage.local.set({ 'resultList' : [] })
+
   // 데이터 서버로 전송
   function sendToServer(userId, otherId, chatList) {
     const data = { 
@@ -36,14 +40,21 @@ if (!window.hasRun) {
       body: JSON.stringify(data),
     })
     .then(response => response.json())
-    .then((data) => {
+    .then(async (data) => {
       chrome.storage.local.set({ 'analyzeResult' : {
         'isScam': data.isScam,
         'badUrl': data.badUrl,
         'chatResponse': data.chatResponse,
         'originChat': data.originChat,
-        'scamCount': 0
+        'badOriginUrl': data.badOriginUrl
       }})
+
+      const resultInfo = await chrome.storage.local.get('resultList')
+      console.log('resultinfo', resultInfo)
+
+      const result = resultInfo?.resultList || [];
+
+      chrome.storage.local.set({ 'resultList' : [data, ...result]})
 
       const percentInfo = chrome.storage.local.get(['scamPercent'])
       const scamCountValue = percentInfo.scamCount
@@ -60,6 +71,10 @@ if (!window.hasRun) {
           'totalCount': totalCountValue + 1
         }})
       }
+    })
+    .then(() => {
+      console.log('setting isDone')
+      chrome.storage.local.set({ 'isDone' : true });
     })
     .catch((error) => console.log('Error:', error));
   }
@@ -139,7 +154,8 @@ if (!window.hasRun) {
       // 상대방 메시지 영역에 있을 때만 추출
       if (isInTargetMessages) {
         const messageText = messageElement.textContent.trim();
-        if (messageText && !chatList.includes(messageText)) {
+        // !chatList.includes(messageText)
+        if (messageText ) {
           chatList.push(messageText);
           console.log(`메시지: ${messageText}`);
           console.log('---------------------');
@@ -225,9 +241,9 @@ if (!window.hasRun) {
               console.log('메시지 입력이 활성화되었습니다.');
   
               // 최종 메시지와 아이디 출력
-              console.log('최종 메시지 목록:', chatList);
-              console.log('최종 상대방 아이디:', otherId);
-              console.log('최종 내 아이디:', userId);
+              // console.log('최종 메시지 목록:', chatList);
+              // console.log('최종 상대방 아이디:', otherId);
+              // console.log('최종 내 아이디:', userId);
 
               // 플래그 초기화
               isReady = true;
@@ -276,25 +292,41 @@ if (!window.hasRun) {
   // 옵저버 설정
   urlObserver.observe(document.body, { childList: true, subtree: true });
 
-  // DOM 변경 감지 및 메시지/아이디 추출
   const mutationObserver = new MutationObserver((mutationsList) => {
     let newMessagesDetected = false;  // 새 메시지 감지
   
     for (const mutation of mutationsList) {
-      // if (mutation.type === 'childList' && mutation.addedNodes.length) {
       if (mutation.type === 'childList') {
         mutation.addedNodes.forEach(node => {
           if (node.nodeType === 1 && node.matches('div[data-virtualized="false"]')) {
-            newMessagesDetected = true;
+            const elements = document.querySelectorAll('div[data-scope="messages_table"] div[dir="auto"]');
+            let isInTargetMessages = false;
+            elements.forEach(messageElement => {
+              const h5Element = messageElement.closest('div[data-scope="messages_table"]').querySelector('h5[dir="auto"] span');
+        
+              if (h5Element) {
+                // 말풍선마다 보낸사람 닉네임 추출
+                const sender = h5Element.textContent.trim();
+        
+                if (sender === otherNickname) {
+                  // 상대방의 메시지 영역에 진입
+                  isInTargetMessages = true;
+                  newMessagesDetected = true;
+                } else if (sender === '보낸 메시지') {
+                  // 내가 보낸 메시지인 경우 처리 안 함
+                  isInTargetMessages = false;
+                } else {
+                  isInTargetMessages = false;
+                }
+              }
+            });
           }
         });
       }
     }
-    
+  
     if (newMessagesDetected) {
       // 일정 시간 대기 후 extractChatList() 호출 (DOM 변화가 완료된 후)
-      // console.log('새 메시지');
-      // console.log(isExtracting);
       setTimeout(() => {
         if (isExtracting === false) {
           extractChatList();  // 새로운 메시지 추출
@@ -302,6 +334,50 @@ if (!window.hasRun) {
       }, 500); // 500ms 대기
     }
   });
+
+  // DOM 변경 감지 및 메시지/아이디 추출
+  // const mutationObserver = new MutationObserver((mutationsList) => {
+  //   let newMessagesDetected = false;  // 새 메시지 감지
+
+  //   for (const mutation of mutationsList) {
+  //     // if (mutation.type === 'childList' && mutation.addedNodes.length) {
+  //     if (mutation.type === 'childList') {
+  //       mutation.addedNodes.forEach(node => {
+  //         if (node.nodeType === 1 && node.matches('div[data-virtualized="false"]')) {
+  //           const elements = document.querySelectorAll('div[data-scope="messages_table"] div[dir="auto"]');
+  //           let isInTargetMessages = false;
+  //           elements.forEach(messageElement => {
+  //             const h5Element = messageElement.closest('div[data-scope="messages_table"]').querySelector('h5[dir="auto"] span');
+        
+  //             if (h5Element) {
+  //               // 말풍선마다 보낸사람 닉네임 추출
+  //               const sender = h5Element.textContent.trim();
+        
+  //               if (sender === otherNickname) {
+  //                 // 상대방의 메시지 영역에 진입
+  //                 isInTargetMessages = true;
+  //                 newMessagesDetected = true;
+  //               } else {
+  //                 isInTargetMessages = false;
+  //               }
+  //             }
+  //           });
+  //         }
+  //       });
+  //     }
+  //   }
+    
+  //   if (newMessagesDetected) {
+  //     // 일정 시간 대기 후 extractChatList() 호출 (DOM 변화가 완료된 후)
+  //     // console.log('새 메시지');
+  //     // console.log(isExtracting);
+  //     setTimeout(() => {
+  //       if (isExtracting === false) {
+  //         extractChatList();  // 새로운 메시지 추출
+  //       }
+  //     }, 500); // 500ms 대기
+  //   }
+  // });
   
   // 옵저버 설정
   mutationObserver.observe(document.body, { childList: true, subtree: true });

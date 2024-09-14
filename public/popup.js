@@ -86,7 +86,7 @@ function createModal() {
   // 동의 버튼 클릭 시 추출 함수 실행 및 모달 닫기
   agreeButton.onclick = () => {
     isScanning = !isScanning; // 상태 토글
-    button.textContent = isScanning ? '검사 중단' : '검사 시작'; 
+    button.textContent = isScanning ? '검사 중단' : '검사 시작';  
 
     document.body.removeChild(modalOverlay);
     // scrollAndExtract(); // 검사 실행 함수 호출
@@ -112,6 +112,10 @@ function createModal() {
         console.error('Error injecting content.js:', error);
       });
     });
+    // if (isScanning) {
+    //   chrome.storage.local.set({ 'noneModal' : true })
+    // }
+    // isScanning = !isScanning;
   };
   btnContainer.appendChild(agreeButton);
 

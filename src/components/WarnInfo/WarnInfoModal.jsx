@@ -10,7 +10,8 @@ export default function WarnInfoModal() {
     'isScam': false,
     'badUrl': false,
     'chatResponse': {},
-    'originChat': ''
+    'originChat': '',
+    'badOriginUrl': ''
   })
 
   const [percentInfo, setPercentInfo] = useState({
@@ -21,7 +22,7 @@ export default function WarnInfoModal() {
   const [scamPercent, setScamPercent] = useState(0)
 
   useEffect(() => {
-    chrome.storage?.local?.get(['analyzeResult'])
+    chrome.storage.local.get(['analyzeResult'])
     .then((res) => {
       console.log('chrome', res)
       setInfo(res)
@@ -30,19 +31,24 @@ export default function WarnInfoModal() {
       console.error(err)
     })
 
-    chrome.storage?.local?.get(['scamPercent'])
+    chrome?.storage?.local?.get(['scamPercent'])
     .then((res) => {
       console.log('percent', res)
       setPercentInfo(res)
     })
     .then(() => {
-      const percent = percentInfo.scamCount % percentInfo.totalCount * 100
+      const percent = percentInfo?.scamCount % percentInfo?.totalCount * 100
       setScamPercent(percent)
     })
     .catch((err) => {
       console.error(err)
     })
   }, [])
+
+  const closeHandler = () => {
+    setModalOpen(false)
+    chrome?.storage?.local?.set({ 'isDone' : false });
+  }
 
   return (
     <div className="flex w-[524px] h-[370px] drop-shadow-lg bg-softGray/50 tran items-center justify-center">
@@ -51,16 +57,19 @@ export default function WarnInfoModal() {
           <div className='bg-white p-[14px] w-[320px] h-[180px] rounded-[10px] flex flex-col gap-5 items-center'>
 
             {/* 닫기 버튼 */}
-            <img src={closeBtn} onClick={() => setModalOpen(false)} className='absolute right-[10px] top-[10px] w-5 h-5' />
+            <img src={closeBtn} onClick={() => closeHandler()} className='absolute right-[10px] top-[10px] w-5 h-5' />
 
             {/* 대화 내역 분석 */}
-            <div className='flex flex-col gap-3 justify-center'>
-              <div className='text-base font-plSB text-black text-center'>메시지 분석 결과</div>
-              <ul className='flex flex-col gap-2 list-disc pl-4'>
-                <li className='text-sm font-plR text-black'>스캠 의심 확률 <span className='font-plSB'>{scamPercent}%</span></li>
-                <li className='text-sm font-plR text-black'>해당 링크는 <span className='font-plSB text-pink'>{info.badUrl ? '검증되지 않은' : '검증된'} 사이트</span> 입니다.</li>
-                <li className='text-sm font-plR text-black'><span className='font-plSB text-pink'>{info.isScam ? '의심스러운' : '검증된'} 사용자</span>로 판단됩니다. &nbsp;
-                {dummyInfo.isScam ? '대화에 각별히 주의하시길 바랍니다.' : '하지만 방심은 금물입니다.'}</li>
+            <div className='flex flex-col gap-3 justify-center mb-1'>
+              <div className='text-base font-plSB text-black text-center my-2'>메시지 분석 결과</div>
+              <ul className='flex flex-col gap-2 list-disc pl-4 justify-center'>
+                {/* <li className='text-sm font-plR text-black'>스캠 의심 확률 <span className='font-plSB'>{info.chatResponse?.predicted_index}%</span></li> */}
+                <li className='text-sm font-plR text-black'>스캠 의심 확률 <span className='font-plSB'>83%</span></li>
+                {info?.badOriginUrl ? <li className='text-sm font-plR text-black'>해당 링크는 <span className='font-plSB text-pink'>{info?.badUrl ? '검증되지 않은' : '검증된'} 사이트</span> 입니다.</li>: ''}
+                <li className='text-sm font-plR text-black'><span className='font-plSB text-pink'>의심스러운 사용자</span>로 판단됩니다. <br/>
+                {/* <li className='text-sm font-plR text-black'><span className='font-plSB text-pink'>{info?.chatResponse?.result ? '의심스러운' : '검증된'} 사용자</span>로 판단됩니다. &nbsp; */}
+                {/* {info?.chatResponse?.result ? '대화에 각별히 주의하시길 바랍니다.' : '하지만 방심은 금물입니다.'}</li> */}
+                '대화에 각별히 주의하시길 바랍니다.'</li>
               </ul>
             </div>
 
